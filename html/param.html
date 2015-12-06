@@ -1,0 +1,48 @@
+<div ng-include="'html/menu.html'"></div>
+
+<div layout="row"  layout-sm="column">
+	<div flex></div>
+	<div flex style="background: white">
+
+	<p>Unit </p>
+	<md-radio-group ng-model="myForm.units" ng-change="saveParams()" >
+      <md-radio-button value="metric" checked>°C</md-radio-button>
+      <md-radio-button value="standard"> °F </md-radio-button>
+    </md-radio-group>
+		      
+	<hr />
+	
+	<p>Lang </p>
+	<md-radio-group ng-model="myForm.lang" ng-change="saveParams()" >
+      <md-radio-button value="fr" checked> Français </md-radio-button>
+      <md-radio-button value="en"> Anglais </md-radio-button>
+      <md-radio-button value="es"> Espagnol </md-radio-button>
+    </md-radio-group>
+			<!--p>
+				<label class="col-sm-2 control-label">Unité</label>
+				<label class="radio-inline">
+					<input type="radio" name="units" ng-model="myForm.units" value="metric" ng-change="saveParams()" checked>
+					°C </label>
+				<label class="radio-inline">
+					<input type="radio" name="units" ng-model="myForm.units" value="standard" ng-change="saveParams()">
+					°F </label>
+			</p>
+
+			<p>
+
+				<label class="col-sm-2 control-label">Langue</label>
+				<label class="radio-inline">
+					<input type="radio" name="lang" ng-model="myForm.lang" value="fr" ng-change="saveParams()" checked>
+					Français </label>
+				<label class="radio-inline">
+					<input type="radio" name="lang" ng-model="myForm.lang" value="en" ng-change="saveParams()">
+					Anglais </label>
+				<label class="radio-inline">
+					<input type="radio" name="lang" ng-model="myForm.lang" value="es" ng-change="saveParams()">
+					Espagnol </label>
+			</p-->
+
+		
+	</div>
+	<div flex></div>
+</div>

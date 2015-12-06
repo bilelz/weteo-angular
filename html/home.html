@@ -1,0 +1,121 @@
+<!-- <div ng-include="'html/menu.html'"></div> -->
+
+<!--<div layout="row"  layout-sm="column">
+  <div flex> </div>
+  <div flex>
+  -->
+  	<div id="cardHead" class="{{(meteo.dt>meteo.sys.sunrise && meteo.dt<meteo.sys.sunset)?'day':'night'}}">
+  		
+        <md-toolbar class=" " style="background-color: transparent"  hide-gt-md>
+	      <div class="md-toolbar-tools">
+	        <md-button class="md-icon-button" aria-label="Close" ng-click="toggleLeft()">
+	          <md-icon md-svg-src="img/menu.svg" ></md-icon>
+	        </md-button>
+	        
+	        
+	        </div>
+	      </md-toolbar>
+  		
+  		<span id="cardCityName">
+  			
+  			<md-icon md-svg-icon="img/star.svg" ng-show="isFav" ng-click="removefavIt(meteo.id)" 
+  			class="favIcon" ></md-icon>
+  			
+  			<md-icon md-svg-icon="img/star-empty.svg" ng-show="!isFav" 
+  				ng-click="favIt(meteo.id, meteo.name, meteo.coord.lat, meteo.coord.lon)" 
+  				class="favIcon" ></md-icon>
+  		
+  			
+  			{{meteo.name}}
+  			
+  			
+  			<span id="sunTime">
+  				<i class="wi wi-sunrise"></i> {{meteo.sys.sunrise*1000 | date:'HH:mm'}}<br/>
+			    	<i class="wi wi-sunset"></i> {{meteo.sys.sunset*1000 | date:'HH:mm'}}
+			    	</span>
+  		</span>
+  		
+  	
+  		<div style="text-align: center">
+	    	<!--<i class="wi meteoIcon wi-owm-{{(itemDetail.sys.pod=='d')?'day':'night'}}-{{meteo.weather[0].id}}" id="cardCityIcon"></i>
+	    	-->
+	    	<span id="cardCityTemp">
+	    		{{meteo.main.temp | number:0}}<SUP ng-if="units=='metric'">°C</SUP><SUP ng-if="units!='metric'">°F</SUP>	
+	    	</span>
+	    	
+	    	<p></p>
+	    	<span id="cardCityDescription">
+  				{{meteo.weather[0].description}}<br/>
+  				<i class="wi wi-humidity"></i> {{meteo.main.humidity }}%  
+	    	<i class="wi wi-strong-wind"></i> {{meteo.wind.speed*3600/1000 | number:0 }} km/h
+  			</span>	
+  			
+    </div>
+    	
+    	<md-button class="md-fab" aria-label="Search" id="searchButton" ng-click="toggleRight()">
+            <md-icon md-svg-src="img/ic_search_48px.svg"></md-icon>
+        </md-button>
+	    
+	    <div id="cardMap"
+	    	style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?center={{meteo.coord.lat}},{{meteo.coord.lon}}&markers=size:md|color:transparent|{{meteo.coord.lat}},{{meteo.coord.lon}}&size=320x320&zoom=2&scale=2&maptype=terrain&style=element:labels|visibility:off');">
+	    </div>
+  
+  	</div>
+  	
+    
+    <md-content class="md-padding">
+    <md-tabs class=""  md-align-tabs="bottom" md-swipe-content="">
+    	<md-tab id="item.index"  ng-repeat="item in forecast.list">
+	        <md-tab-label>
+	        	<div>{{item.dt*1000 | date : 'EEE'}}</div>
+			    <div><i class="wi wi-owm-day-{{item.weather[0].id}}"></i></div>
+			    <div>{{item.main.temp | number:0}}°</div>
+	        </md-tab-label>
+	        <md-tab-body style="text-align: center">
+	          <div>{{item.dt*1000 | date : 'EEEE'}}</div>
+			    <div layout="row" layout-wrap  style="text-align: center">
+			    	
+			    	
+			    	<table>
+			    		<tr>
+			    			<td   ng-repeat="itemDetail in item.dayDetailList" title="{{itemDetail.weather[0].description}}"
+			    			class="{{(itemDetail.sys.pod=='d')?'day':'night'}}"
+			    			>
+							    <div>{{itemDetail.main.temp | number:0}}°</div>
+							   
+							    <div class="iconDayDetail"><i class="wi wi-owm-{{(itemDetail.sys.pod=='d')?'day':'night'}}-{{itemDetail.weather[0].id}}"></i></div>
+					     		<div><small>{{itemDetail.dt*1000 | date : 'H'}}h</small></div>
+					  </td>
+			    		</tr>
+			    	</table>
+					  
+			  	</div>
+			    
+			    
+	        </md-tab-body>
+	      </md-tab>
+    </md-tabs>
+  </md-content>
+   
+    
+    
+    <div style="text-align: center">
+  	<md-button class="md-raised" ng-click="showAdvanced($event, meteo.name, meteo.id)">
+  		 <md-icon md-svg-icon="img/ic_share_48px.svg"></md-icon> Share
+  		 <br/>
+  		
+  		weteo.fr/{{meteo.name}}/{{meteo.id}}
+  	</md-button>
+  	<p></p>
+  	
+  	<a class="md-button md-raised" aria-label="Param" href="#param">
+          Param.
+        </a>
+        
+  	</div>
+  	
+  	
+  	<!--</div>
+    
+  <div flex>  </div>
+</div>-->

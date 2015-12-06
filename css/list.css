@@ -1,0 +1,9 @@
+md-list-item{
+	border-top: 1px solid #ccc;
+	//background-color: #F3D9A9;
+}
+
+md-list-item.night{
+	background-color: #00083E;
+	color : white;
+}

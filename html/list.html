@@ -1,0 +1,25 @@
+
+		<md-list ng-cloak>
+			<md-subheader class="md-no-sticky">
+				{{favList.length}} <md-icon md-svg-icon="img/star.svg" ></md-icon>
+			</md-subheader>
+			  
+			  <md-list-item class="" ng-repeat="fav in favList" ng-click="rechercheID(fav.id)">
+			    <p>
+			    	
+			    	{{ fav.label }}</p>
+			    
+			    
+			    <md-button class="md-fab md-mini md-warn" aria-label="Remove this fav" ng-click="removefav(fav.id)">
+		          <md-icon md-svg-src="img/trash.svg" ></md-icon>
+		        </md-button>
+
+			    
+			  </md-list-item>
+			  
+			</md-list>
+			
+			<a ng-click="goSearch()" class="md-raised md-button md-primary" ng-show="favList.length == 0" class="md-primary">
+				No fav! Go search
+			</a>
+			
