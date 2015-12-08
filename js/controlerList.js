@@ -39,9 +39,14 @@ app.controller(
 			$http.get('http://api.openweathermap.org/data/2.5/forecast?id='+ id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
 					.success(function(data) {
 						$rootScope.forecast = parseForecastOneMaxTempByDay2(data);
+						$scope.chart($rootScope.forecast[0]);
 					}).error(function(data) {
 						$rootScope.loadingMsg = "Erreur pour les données sur 5 jours...";
 					});
+		};
+		
+		$scope.chart = function(item) {
+			chartIt(item);
 		};
 		
 	$scope.removefav = function(_id) {

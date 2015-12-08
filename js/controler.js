@@ -36,6 +36,7 @@ app.controller(
 								localStorage.setItem("cityID", data.id);
 								$rootScope.isFav = isFav(id);
 								window.scrollTo(0,0);
+								
 					}).error(function(data) {
 								$rootScope.meteo = {
 									name : "Hum. Error... please retry."
@@ -46,6 +47,7 @@ app.controller(
 			$http.get('http://api.openweathermap.org/data/2.5/forecast?id='+ id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
 					.success(function(data) {
 						$rootScope.forecast = parseForecastOneMaxTempByDay2(data);
+						$scope.chart($rootScope.forecast[0]);
 					}).error(function(data) {
 						$rootScope.loadingMsg = "Erreur pour les données sur 5 jours...";
 					});
@@ -70,6 +72,10 @@ app.controller(
 		 	removefav(_id);
 			$rootScope.isFav = false;
 			$rootScope.favList = JSON.parse(localStorage.getItem("favorites")).sort(comparator);
+		};
+		
+		$scope.chart = function(item) {
+			chartIt(item);
 		};
 		
 	if (localStorage.getItem("cityID") != "") {
@@ -160,8 +166,8 @@ function parseForecastOneMaxTempByDay2(dataList) {
 	var days = {
 		list : []
 	};
-	
-	var lastDay = "";
+
+	var lastDay = "", index = 0;
 
 	for (var i = 0; i < dataList.list.length; i++) {
 				
@@ -173,15 +179,18 @@ function parseForecastOneMaxTempByDay2(dataList) {
 			
 
 		} else {
+			
 			days.list.push(dataList.list[i]);
 			
 			days.list[days.list.length-1].dayDetailList = [];
 			
 			days.list[days.list.length-1].dayDetailList.push(dataList.list[i]);
+			days.list[days.list.length-1].index = index++;
 			
 		}
 		lastDay = dataList.list[i].dt_txt.substring(0, 10);
 	}
+	
 	return getMaxTempPerDay(days);
 }
 
@@ -202,3 +211,73 @@ function getMaxTempPerDay(data){
 	return data;
 	
 }
+
+function chartIt(item) {
+		console.log(item);
+		var chartData = [];
+			for(var i=0; i<item.dayDetailList.length;i++){
+			chartData.push([item.dayDetailList[i].dt*1000, 
+							Math.ceil(item.dayDetailList[i].main.temp)]);	
+		 	}		 	
+	
+			var options = {
+				chart : {
+					renderTo : 'container' + item.index,
+					type : 'spline',
+					backgroundColor: '#000028',
+					animation : "false"
+				},
+				title : { text : '' },
+				yAxis : [{ visible : false }],
+				xAxis : {
+					type : 'linear',
+					ordinal : false,
+					labels : { format : '{value:%Hh}' },
+					formatter : function() {
+						return parseInt((Highcharts.dateFormat('%H', this.value)), 10);	
+					},
+					tickInterval : 3*3600 * 1000 // un trait toutes les heures
+				},
+	
+				plotOptions : {
+					series : {
+						dataLabels : {
+							enabled : true,
+							 format: '{y}°',
+							 useHTML : false,
+							 animation: false,
+							 style : {
+							 	color : "white",
+							 	textShadow : "none"
+							 }
+						}
+					},
+					spline: {
+                marker: {
+                    enabled: true
+                }
+            }
+				},
+				legend : {  enabled : false, },
+				scrollbar : { enabled : false },
+				rangeSelector : { enabled : false },
+				credits : { enabled : false },
+				exporting : { enabled : false },
+				navigator : { enabled : false, height : 0 },
+				series : [{	color: '#FF4081',
+            				type : "areaspline",
+            				marker: {
+            					enabled :"true",
+                    fillColor: '#FF4081'
+                },
+            				fillColor : {
+         	 				linearGradient : [0, 0, 0, 100],
+					              			stops : [  [0, "#FF4081"],
+									                [1, 'rgba(2,0,0,0)']]
+					            }
+           			  }]
+			}; 
+			
+			options.series[0].data = chartData;
+			var chart = new Highcharts.StockChart(options);
+		};

@@ -36,6 +36,7 @@ app.controller(
 								$http.get('http://api.openweathermap.org/data/2.5/forecast?id='+ data.id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
 									.success(function(data) {
 										$rootScope.forecast = parseForecastOneMaxTempByDay2(data);
+										$scope.chart($rootScope.forecast[0]);
 									}).error(function(data) {
 										$rootScope.loadingMsg = "Erreur pour les données sur 5 jours...";
 									});
@@ -51,7 +52,9 @@ app.controller(
 								$rootScope.loadingMsg = "";
 							});
 			
-			
+		$scope.chart = function(item) {
+			chartIt(item);
+		};
 			
 		};
 });
@@ -78,93 +81,3 @@ app.controller('ParamController',  function($scope, $mdToast) {
 } );
 
 
-
-function parseForecastOneMaxTempByDay(data) {
-	var days = {
-		list : []
-	};
-	
-	var lastDay = "";
-	var lastMaxTemp = -200;
-	var maxIdPerDay = 0;
-	var idx = 0;
-
-	for (var i = 0; i < data.list.length; i++) {
-				
-		if (data.list[i].dt_txt.substring(0, 10) != lastDay) {
-			
-			
-			lastDay = data.list[i].dt_txt.substring(0, 10);
-			maxIdPerDay = i;
-			if (i > 1) {
-				data.list[i - 1].maxTemp = lastMaxTemp;
-				lastMaxTemp = data.list[i - 1].main.temp;
-			}
-			
-			
-			days.list.push(data.list[maxIdPerDay]);
-			days.list[days.list.length-1].dayDetailList = [];
-			days.list[days.list.length-1].dayDetailList.push(data.list[i]);
-			
-			lastMaxTemp = -200;
-
-		} else {
-			// stock l'id du moment le plus chaud
-			if (data.list[i].main.temp > lastMaxTemp) {
-				lastMaxTemp = data.list[i].main.temp;
-				maxIdPerDay = i;
-			}
-			
-			days.list[days.list.length-1].dayDetailList.push(data.list[i]);
-			
-		}
-	}
-	return days;
-}
-
-function parseForecastOneMaxTempByDay2(dataList) {
-	var days = {
-		list : []
-	};
-	
-	var lastDay = "";
-
-	for (var i = 0; i < dataList.list.length; i++) {
-				
-		if (dataList.list[i].dt_txt.substring(0, 10) == lastDay) {
-			
-			
-			
-			days.list[days.list.length-1].dayDetailList.push(dataList.list[i]);
-			
-
-		} else {
-			days.list.push(dataList.list[i]);
-			
-			days.list[days.list.length-1].dayDetailList = [];
-			
-			days.list[days.list.length-1].dayDetailList.push(dataList.list[i]);
-			
-		}
-		lastDay = dataList.list[i].dt_txt.substring(0, 10);
-	}
-	return getMaxTempPerDay(days);
-}
-
-
-function getMaxTempPerDay(data){
-	
-	for (var i = 0; i < data.list.length; i++) {
-		for (var j = 0; j < data.list[i].dayDetailList.length; j++) {
-			if(data.list[i].dayDetailList[j].main.temp > data.list[i].main.temp){
-				data.list[i].main.temp = data.list[i].dayDetailList[j].main.temp;
-				data.list[i].sys.pod = data.list[i].dayDetailList[j].sys.pod;
-				data.list[i].weather[0].description = data.list[i].dayDetailList[j].weather[0].description;
-			}
-		}
-	}
-	
-	
-	return data;
-	
-}

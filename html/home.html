@@ -37,8 +37,8 @@
   		
   	
   		<div style="text-align: center">
-	    	<!--<i class="wi meteoIcon wi-owm-{{(itemDetail.sys.pod=='d')?'day':'night'}}-{{meteo.weather[0].id}}" id="cardCityIcon"></i>
-	    	-->
+	    	<i class="wi meteoIcon wi-owm-{{(itemDetail.sys.pod=='d')?'day':'night'}}-{{meteo.weather[0].id}}" id="cardCityIcon"></i>
+	    	
 	    	<span id="cardCityTemp">
 	    		{{meteo.main.temp | number:0}}<SUP ng-if="units=='metric'">°C</SUP><SUP ng-if="units!='metric'">°F</SUP>	
 	    	</span>
@@ -63,9 +63,9 @@
   	</div>
   	
     
-    <md-content class="md-padding">
-    <md-tabs class=""  md-align-tabs="bottom" md-swipe-content="">
-    	<md-tab id="item.index"  ng-repeat="item in forecast.list">
+ <md-content class="md-padding" >
+    <md-tabs class=""  md-align-tabs="bottom" md-swipe-content=""  md-center-tabs="true">
+    	<md-tab id="item.index"  ng-repeat="item in forecast.list"  md-on-select="chart(item)">
 	        <md-tab-label>
 	        	<div>{{item.dt*1000 | date : 'EEE'}}</div>
 			    <div><i class="wi wi-owm-day-{{item.weather[0].id}}"></i></div>
@@ -75,16 +75,16 @@
 	          <div>{{item.dt*1000 | date : 'EEEE'}}</div>
 			    <div layout="row" layout-wrap  style="text-align: center">
 			    	
-			    	
+			    	<div id="container{{item.index}}" style="width: 100%; height: 200px; margin: 0 auto"></div>
 			    	<table>
 			    		<tr>
 			    			<td   ng-repeat="itemDetail in item.dayDetailList" title="{{itemDetail.weather[0].description}}"
 			    			class="{{(itemDetail.sys.pod=='d')?'day':'night'}}"
 			    			>
-							    <div>{{itemDetail.main.temp | number:0}}°</div>
+							    <!--<div>{{itemDetail.main.temp | number:0}}°</div>-->
 							   
 							    <div class="iconDayDetail"><i class="wi wi-owm-{{(itemDetail.sys.pod=='d')?'day':'night'}}-{{itemDetail.weather[0].id}}"></i></div>
-					     		<div><small>{{itemDetail.dt*1000 | date : 'H'}}h</small></div>
+					     		<!--<div><small>{{itemDetail.dt*1000 | date : 'H'}}h</small></div>-->
 					  </td>
 			    		</tr>
 			    	</table>

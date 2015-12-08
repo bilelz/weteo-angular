@@ -190,7 +190,7 @@ md-tabs[md-align-tabs="bottom"] md-tabs-content-wrapper {
 }
 
 md-tabs:not(.md-no-tab-content):not(.md-dynamic-height) {
-    min-height: 210px;
+    min-height: 400px;
 }
 
 md-tabs[md-align-tabs="bottom"] {
