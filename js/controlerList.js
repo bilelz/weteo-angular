@@ -10,39 +10,10 @@ app.controller(
    
 
     $scope.rechercheID = function(id) {
-			$rootScope.loadingClass = "zoomOut";
-			$rootScope.loadingMsg = "Recherche en cours...";
 
-			$timeout(function() {
-				$rootScope.loadingClass = "bounceIn";
-				// $scope.meteo = {name:"Searching..."};
+			searchViaID(id,$scope, $rootScope, $timeout, $http, $mdSidenav);
 
-			}, 1000 / 2);
-
-			$http.get('http://api.openweathermap.org/data/2.5/weather?id=' + id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
-					.success(function(data) {
-								$rootScope.currentID = data.id;
-								$rootScope.meteo = data;
-								$rootScope.loadingMsg = "";
-								localStorage.setItem("city", data.name);
-								localStorage.setItem("cityID", data.id);
-								$rootScope.isFav = isFav(id);
-								$mdSidenav('left').close();
-								window.scrollTo(0,0);
-					}).error(function(data) {
-								$rootScope.meteo = {
-									name : "Hum. Error... please retry."
-								};
-								$rootScope.loadingMsg = "";
-							});
-
-			$http.get('http://api.openweathermap.org/data/2.5/forecast?id='+ id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
-					.success(function(data) {
-						$rootScope.forecast = parseForecastOneMaxTempByDay2(data);
-						$scope.chart($rootScope.forecast[0]);
-					}).error(function(data) {
-						$rootScope.loadingMsg = "Erreur pour les données sur 5 jours...";
-					});
+			
 		};
 		
 		$scope.chart = function(item) {

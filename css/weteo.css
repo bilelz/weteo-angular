@@ -2,13 +2,21 @@ body, html {
     position: relative;
     background: #E5E5E5;
     color: #444;
+    font-family: 'Roboto', sans-serif;
     -webkit-font-smoothing: antialiased;
+    -webkit-transform: translate3d(0,0,0);
+	transform: translate3d(0,0,0);
+	z-index: 2;
+}
+
+.layout-column{
+	background: #E5E5E5;
 }
 
 #home{
 	width: 100%;
     margin: 0 auto;
-    max-width: 500px;
+    max-width: 700px;
 }
 
 	#weteo{
@@ -19,7 +27,7 @@ body, html {
 
 	#cardHead{
 		position: relative;
-    	padding: 10px;
+    	padding-bottom: 50px;
 	}
 	#cardHead * {
 		z-index: 2;
@@ -29,6 +37,8 @@ body, html {
 	#cardHead.night {
 		 color : white;
 	}
+	
+	
 	
 	.favIcon{
 		vertical-align: baseline;
@@ -51,22 +61,17 @@ body, html {
     	background-position:  center;
     	-webkit-filter: sepia(1);
     	filter: sepia(1);
-    	-webkit-transform: translate3d(0,0,0);
-    	transform: translate3d(0,0,0);
+    	
 	}
 	
-	#cardHead.night #cardMap{
+	 #cardMap.night{
 		 -webkit-filter: sepia(1) invert(1);
 		 filter: sepia(1) invert(1);
 	}
 	
 	#cardHead md-toolbar{
 		background-color: transparent;
-	    padding: 0;
-	    margin-top: -10px;
-	    min-height: 36px;
-	    height: 36px;
-	    margin-left: -20px;
+	    color: inherit;
 	}
 	
 	#cardHead md-icon{
@@ -81,21 +86,20 @@ body, html {
 		    position: absolute;
     bottom: -33px;
     right: 0;
+        z-index: 3;
 	}
 	
 #cardCityName{
 	font-size: 36px;
     text-align: center;
-    //display: block;
-    margin-bottom: 20px;
-        display: block;
-            text-align: left;
+    display: block;
+    text-align: left;
     position: relative;
  
 }
 
 #cardCityIcon{
-    font-size: 128px;
+    font-size: 64px;
     color: white;
     vertical-align: middle;
     text-shadow: 0px 1px 1px #444444;
@@ -103,11 +107,19 @@ body, html {
 }
 
 #cardCityTemp{
-	       font-size: 64px;
+	font-size: 64px;
     line-height: 64px;
     vertical-align: middle;
     display: inline-block;
     font-weight: 100;
+}
+
+
+
+@media screen and (min-width: 700px) {
+    #cardCityIcon{
+		font-size: 128px;
+	}
 }
 
 sup{
@@ -117,11 +129,11 @@ sup{
 }
 
 
-#cardCityDescription{
+.cardCityDescription{
 	opacity: .5;
+    position: relative;
     text-align: center;
-    text-transform: uppercase;
-    
+    z-index: 5;  
 }
 
 #cardCityInfo{
@@ -134,101 +146,10 @@ sup{
     vertical-align: middle;
 }
 
-#cardForecast{
-	    text-align: center;
-    margin-top: 50px;
-}
 
-#cardForecast i, md-tabs-canvas i{
-	font-size: 32px;
-	    margin: 5px 0;
-	    
-}
-
-md-tabs-content-wrapper{
-	text-align: center;
-}
-
-md-tabs-content-wrapper table{
-	width: 100%;
-}
-
-#sunTime{
-	font-size: 16px;
-    opacity: .5;
-	position: absolute;
-    right: 0;
-    bottom: 8px;
-}
-
-td.night .iconDayDetail{
-/*	background-color: darkblue;
-	color : white;
-background-image:
-radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
-radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px),
-radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px);
-background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px; 
-background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;*/
-}
-
-td.night:last-child{
-	//background-image: linear-gradient(to right, darkblue 20%, white);
-}
-
-md-pagination-wrapper {
-    height: 110px;
-   }
-   
-md-tabs[md-align-tabs="bottom"] md-tabs-wrapper , md-tabs-canvas {
-    height: 110px;
-}
-
-md-tabs[md-align-tabs="bottom"] md-tabs-content-wrapper {
-    bottom: 110px;
-}
-
-md-tabs:not(.md-no-tab-content):not(.md-dynamic-height) {
-    min-height: 400px;
-}
-
-md-tabs[md-align-tabs="bottom"] {
-    padding-bottom: 0;
-}
-
-.md-padding {
-     padding: 10px 0 0 0 ; 
-}
-
-.md-tab {
-   // padding: 12px ;
-}
-
-md-tabs.md-default-theme md-ink-bar, md-tabs md-ink-bar {
-    color: rgb(255,82,82) !important;
-    background: rgb(255,82,82) !important;
-}
-
-md-tabs md-icon.md-default-theme, md-tabs md-icon {
-    //color: rgba(255, 255, 255, 0.54);
-}
-
-md-tabs.md-default-theme .md-tab.md-active, md-tabs .md-tab.md-active, md-tabs.md-default-theme .md-tab.md-active md-icon, md-tabs .md-tab.md-active md-icon, md-tabs.md-default-theme .md-tab.md-focused, md-tabs .md-tab.md-focused, md-tabs.md-default-theme .md-tab.md-focused md-icon, md-tabs .md-tab.md-focused md-icon {
-    color: rgb(63,81,181) !important;
-}
-
-md-tabs.md-default-theme.md-primary, 
-md-tabs.md-primary > md-tabs-wrapper > md-tabs-canvas > md-pagination-wrapper > md-tab-item:not([disabled]).md-active, 
-md-tabs.md-default-theme.md-primary, 
-md-tabs.md-primary > md-tabs-wrapper > md-tabs-canvas > md-pagination-wrapper > md-tab-item:not([disabled]).md-focused {
-    box-shadow: 0px 0px 1px inset;
-  }
-
-
-#cardHead .wi-owm-day-800 {
+.wi-owm-day-800 {
 	color: orange !important;
-    text-shadow: 0px 1px 1px #FFFFFF !important;
+    text-shadow: none !important;
     
     -webkit-animation: rotation360 30s infinite linear;
     -moz-animation: rotation360 30s infinite linear;

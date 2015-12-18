@@ -10,8 +10,8 @@
 			    	{{ fav.label }}</p>
 			    
 			    
-			    <md-button class="md-fab md-mini md-warn" aria-label="Remove this fav" ng-click="removefav(fav.id)">
-		          <md-icon md-svg-src="img/trash.svg" ></md-icon>
+			    <md-button class="md-icon-button removeFav" aria-label="Remove this fav" ng-click="removefav(fav.id)">
+		          <md-icon md-svg-src="img/close.svg" ></md-icon>
 		        </md-button>
 
 			    
@@ -19,7 +19,22 @@
 			  
 			</md-list>
 			
-			<a ng-click="goSearch()" class="md-raised md-button md-primary" ng-show="favList.length == 0" class="md-primary">
-				No fav! Go search
+			<a ng-click="goSearch()" class="md-raised md-button" >
+				 Search...
 			</a>
 			
+			<a ng-click="goSearch()" class="md-raised md-button md-primary" ng-show="favList.length == 0">
+				No fav!
+				 Search...
+			</a>
+
+<style>
+	.removeFav{
+		opacity: .5;
+	}
+	
+	.removeFav:hover, .removeFav:active, .removeFav:focus{
+		opacity: 1;
+	}
+	
+</style>

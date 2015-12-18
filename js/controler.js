@@ -1,6 +1,6 @@
 app.controller(
         'HomeController',
-        function($scope,$rootScope, $location, $http, $mdToast, $mdDialog, $timeout, Fav) {
+        function($scope,$rootScope, $location, $http, $mdToast, $mdDialog, $timeout, Fav, $mdSidenav) {
    
    $scope.lang = localStorage.getItem("lang");
 	$scope.units = localStorage.getItem("units");
@@ -22,38 +22,10 @@ app.controller(
    
    
 	$scope.rechercheID = function(id) {
-			$rootScope.loadingClass = "zoomOut";
-
-			$timeout(function() {
-				$rootScope.loadingClass = "bounceIn";
-			}, 1000 / 2);
-
-			$http.get('http://api.openweathermap.org/data/2.5/weather?id=' + id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
-					.success(function(data) {
-								$rootScope.currentID = data.id;
-								$rootScope.meteo = data;
-								$rootScope.loadingMsg = "";
-								localStorage.setItem("cityID", data.id);
-								$rootScope.isFav = isFav(id);
-								window.scrollTo(0,0);
-								
-					}).error(function(data) {
-								$rootScope.meteo = {
-									name : "Hum. Error... please retry."
-								};
-								$rootScope.loadingMsg = "";
-							});
-
-			$http.get('http://api.openweathermap.org/data/2.5/forecast?id='+ id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
-					.success(function(data) {
-						$rootScope.forecast = parseForecastOneMaxTempByDay2(data);
-						$scope.chart($rootScope.forecast[0]);
-					}).error(function(data) {
-						$rootScope.loadingMsg = "Erreur pour les données sur 5 jours...";
-					});
+			searchViaID(id,$scope, $rootScope, $timeout, $http, $mdSidenav);
 		};
 		
-		 $scope.favIt = function(id, label, lat, lon) {
+		$scope.favToggle = function(id, label, lat, lon) {
 		 	if(!isFav(id)){
 				var favlist = JSON.parse(localStorage.getItem("favorites"));				
 				
@@ -65,18 +37,21 @@ app.controller(
 				$rootScope.isFav = true;
 				
 				$rootScope.favList = JSON.parse(localStorage.getItem("favorites")).sort(comparator);
+			}else{
+				removefav(id);
+				$rootScope.isFav = false;
+				$rootScope.favList = JSON.parse(localStorage.getItem("favorites")).sort(comparator);
 			}
 		};
 		
-		$scope.removefavIt = function(_id) {
-		 	removefav(_id);
-			$rootScope.isFav = false;
-			$rootScope.favList = JSON.parse(localStorage.getItem("favorites")).sort(comparator);
-		};
 		
 		$scope.chart = function(item) {
 			chartIt(item);
 		};
+		
+		function comparator(a, b) {
+		    return a["label"] > b["label"];
+		}
 		
 	if (localStorage.getItem("cityID") != "") {
 			cityID = localStorage.getItem("cityID");
@@ -162,77 +137,116 @@ function parseForecastOneMaxTempByDay(data) {
 	return days;
 }
 
-function parseForecastOneMaxTempByDay2(dataList) {
-	var days = {
-		list : []
-	};
-
-	var lastDay = "", index = 0;
-
+function parseForecastFromScratch(dataList, dataToday) {
+	var daysList = [];
+	dataToday.sys.pod = (dataToday.dt>dataToday.sys.sunrise && dataToday.dt<dataToday.sys.sunset)?'d':'n';
+	dataToday.dt_txt = new Date(dataToday.dt*1000).toISOString();
+	var lastDay = dataToday.dt_txt.substring(0, 10);
+	console.log(lastDay);
+	
+	var minTempAllDay = 0, maxTempAllDay = 0;
+	
+	daysList.push(dataToday);
+	
 	for (var i = 0; i < dataList.list.length; i++) {
 				
-		if (dataList.list[i].dt_txt.substring(0, 10) == lastDay) {
-			
-			
-			
-			days.list[days.list.length-1].dayDetailList.push(dataList.list[i]);
-			
-
-		} else {
-			
-			days.list.push(dataList.list[i]);
-			
-			days.list[days.list.length-1].dayDetailList = [];
-			
-			days.list[days.list.length-1].dayDetailList.push(dataList.list[i]);
-			days.list[days.list.length-1].index = index++;
-			
+		if (dataList.list[i].dt_txt.substring(0, 10) != lastDay) {
+			daysList.push(dataList.list[i]);
+			lastDay = dataList.list[i].dt_txt.substring(0, 10);
+			console.log(lastDay);
 		}
-		lastDay = dataList.list[i].dt_txt.substring(0, 10);
+		
+		if(dataList.list[i].main.temp > maxTempAllDay){
+			maxTempAllDay = dataList.list[i].main.temp;
+		} else if(dataList.list[i].main.temp < minTempAllDay){
+			minTempAllDay = dataList.list[i].main.temp;
+		}
 	}
 	
-	return getMaxTempPerDay(days);
-}
-
-
-function getMaxTempPerDay(data){
+	console.log(daysList);
 	
-	for (var i = 0; i < data.list.length; i++) {
-		for (var j = 0; j < data.list[i].dayDetailList.length; j++) {
-			if(data.list[i].dayDetailList[j].main.temp > data.list[i].main.temp){
-				data.list[i].main.temp = data.list[i].dayDetailList[j].main.temp;
-				data.list[i].sys.pod = data.list[i].dayDetailList[j].sys.pod;
-				data.list[i].weather[0].description = data.list[i].dayDetailList[j].weather[0].description;
+	// pour chaque jour, on met une liste de donnée par heure
+	for (var i = 0; i < daysList.length; i++) {
+		
+		daysList[i].index = i;
+		daysList[i].minTemp = minTempAllDay;
+		daysList[i].maxTemp = maxTempAllDay;
+		daysList[i].dayDetailList = [];
+		daysList[i].currentDayPod = dataToday.sys.pod;
+		
+		var minTemp = 1000, maxTemp = -3000, iconID = 800;
+		
+		for(var j=0; j < dataList.list.length; j++){
+			
+			if (dataList.list[j].dt_txt.substring(0, 10) == daysList[i].dt_txt.substring(0, 10)) {
+				
+				var tmp = new Object();
+				
+				tmp = JSON.parse(JSON.stringify(dataList.list[j]));
+				
+				daysList[i].dayDetailList.push(tmp);
+				console.log(dataList.list[j].dt_txt  + " " + dataList.list[j].main.temp);
+				
+				if(dataList.list[j].main.temp < minTemp){
+					minTemp = dataList.list[j].main.temp ;
+				} 
+				 if(dataList.list[j].main.temp > maxTemp){
+					maxTemp = dataList.list[j].main.temp ;
+					iconID = dataList.list[j].weather[0].id ;
+				}
 			}
-		}
+		}	
+		
+		daysList[i].main.temp = maxTemp;
+		daysList[i].weather[0].id = iconID;
+		
+		
 	}
 	
-	
-	return data;
+	console.log(daysList);
+	return((daysList));
+
 	
 }
+
+
 
 function chartIt(item) {
-		console.log(item);
+		console.log(item.minTemp + '|' +item.maxTemp );
+		
 		var chartData = [];
-			for(var i=0; i<item.dayDetailList.length;i++){
-			chartData.push([item.dayDetailList[i].dt*1000, 
-							Math.ceil(item.dayDetailList[i].main.temp)]);	
-		 	}		 	
+		for(var i=0; i<item.dayDetailList.length;i++){
+			chartData.push([item.dayDetailList[i].dt*1000,  
+							Math.round(item.dayDetailList[i].main.temp),
+							item.weather[0].id]);	
+	 	}		 	
 	
 			var options = {
 				chart : {
 					renderTo : 'container' + item.index,
 					type : 'spline',
-					backgroundColor: '#000028',
-					animation : "false"
+					backgroundColor: 'transparent', 
+					animation : "false",
+            marginLeft: 0,
+            marginRight : 0
 				},
 				title : { text : '' },
-				yAxis : [{ visible : false }],
+				yAxis : [{ visible : false, min: item.minTemp, max: item.maxTemp }],
 				xAxis : {
 					type : 'linear',
 					ordinal : false,
-					labels : { format : '{value:%Hh}' },
+					tickLength: 3,
+		            tickWidth: 0,
+		            tickPosition: 'inside',
+		            tickColor : 'white',
+		            lineWidth: 0,
+		            labels: {
+		            	format : '{value:%Hh}',
+		                align: 'center',
+		                x: 0,
+		                y: -5,
+		                style : {"color":"#ffffff"}
+		            },
 					formatter : function() {
 						return parseInt((Highcharts.dateFormat('%H', this.value)), 10);	
 					},
@@ -241,14 +255,16 @@ function chartIt(item) {
 	
 				plotOptions : {
 					series : {
+						animation : false,
 						dataLabels : {
 							enabled : true,
 							 format: '{y}°',
 							 useHTML : false,
 							 animation: false,
 							 style : {
-							 	color : "white",
-							 	textShadow : "none"
+							 	color : '#ffffff',
+							 	textShadow : "none",
+							 	fontWeight: 'normal'
 							 }
 						}
 					},
@@ -267,13 +283,13 @@ function chartIt(item) {
 				series : [{	color: '#FF4081',
             				type : "areaspline",
             				marker: {
-            					enabled :"true",
+            				enabled :"true",
                     fillColor: '#FF4081'
                 },
             				fillColor : {
-         	 				linearGradient : [0, 0, 0, 100],
-					              			stops : [  [0, "#FF4081"],
-									                [1, 'rgba(2,0,0,0)']]
+         	 				linearGradient : [0, 0, 0, 200],
+					              			stops : [  [0, '#FF4081'],    
+									                [1, 'rgba(255,255,255,0)']]
 					            }
            			  }]
 			}; 
