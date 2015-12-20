@@ -33,7 +33,7 @@
        
   			
   	
-  		<div style="text-align: center">
+  		<div style="text-align: center" class="animated {{animClass}}">
 	    	<i class="wi meteoIcon wi-owm-{{(itemDetail.sys.pod=='d')?'day':'night'}}-{{meteo.weather[0].id}}" id="cardCityIcon"></i>
 	    	
 	    	<span id="cardCityTemp">
@@ -97,9 +97,6 @@
     <div style="text-align: center" class="darkBg">
 	  	<md-button class="md-raised" ng-click="showAdvanced($event, meteo.name, meteo.id)">
 	  		 <md-icon md-svg-icon="img/ic_share_48px.svg"></md-icon> Share
-	  		 <br/>
-	  		
-	  		weteo.fr/{{meteo.name}}/{{meteo.id}}
 	  	</md-button>
 	  	<p></p>
 	  	

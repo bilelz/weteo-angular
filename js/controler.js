@@ -5,19 +5,25 @@ app.controller(
    $scope.lang = localStorage.getItem("lang");
 	$scope.units = localStorage.getItem("units");
 
-   $scope.showAdvanced = function(ev, name, id) {
+   $scope.showAdvanced = function(ev, label, id) {
     $mdDialog.show({
       controller: DialogController,
       templateUrl: 'html/dialog.tmpl.html',
       parent: angular.element(document.body),
       targetEvent: ev,
-      clickOutsideToClose:true
+      clickOutsideToClose:true,
+                locals:{
+                	label : label,
+                	id : id,
+                	protocol : document.location.protocol,
+                	host : document.location.host
+                }
     })
-    .then(function(answer) {
-      $scope.status = 'You said the information was "' + answer + '".';
-    }, function() {
-      $scope.status = 'You cancelled the dialog.';
-    });
+        .then(function(answer) {
+          $scope.status = 'You said the information was "' + answer + '".';
+        }, function() {
+          $scope.status = 'You cancelled the dialog.';
+        });
   };
    
    
@@ -59,7 +65,9 @@ app.controller(
 	}
 });
 
-function DialogController($scope, $mdDialog) {
+function DialogController($scope, $mdDialog, locals) {
+	
+	$scope.locals = locals;
   $scope.hide = function() {
     $mdDialog.hide();
   };
@@ -197,8 +205,11 @@ function parseForecastFromScratch(dataList, dataToday) {
 			}
 		}	
 		
-		daysList[i].main.temp = maxTemp;
+		if(maxTemp != -3000){
+			daysList[i].main.temp = maxTemp;
 		daysList[i].weather[0].id = iconID;
+		}
+		
 		
 		
 	}

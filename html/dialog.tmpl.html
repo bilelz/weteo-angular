@@ -1,4 +1,72 @@
-<md-dialog aria-label="Mango (Fruit)"  ng-cloak>
+<md-dialog aria-label="Mango (Fruit)">
+  <form>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Share via</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          &times;
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content style="">
+     <md-list>
+				<md-subheader class="md-no-sticky" style="text-align: center">
+					<a href="{{locals.protocol}}//{{locals.host}}/{{locals.label | text2AlphaNum}}/{{locals.id}}">
+						{{locals.host}}/{{locals.label | text2AlphaNum}}/{{locals.id}}
+					</a> 					
+				</md-subheader>
+				<md-list-item class="md-1-line" >
+					<div class="md-list-item-text" layout="column" style="width: 100%;">
+						<md-button 
+							href="http://www.facebook.com/sharer/sharer.php?u={{locals.protocol}}//{{locals.host}}/{{locals.label | text2AlphaNum}}/{{locals.id}}" target="_blank"
+							  class="md-raised md-primary">
+							Facebook
+						</md-button>
+					</div>
+				</md-list-item>
+				<md-divider ></md-divider>
+				<md-list-item class="md-1-line" >
+					<div class="md-list-item-text" layout="column" style="width: 100%;">
+						<md-button  href="https://twitter.com/intent/tweet?text=Weteo @ {{locals.label}}%20%23weteo via @bilelz&url={{locals.protocol}}//{{locals.host}}/{{locals.label | text2AlphaNum}}/{{locals.id}}" target="_blank"
+						
+						  class="md-raised md-primary" style="background-color: #55acee">
+							Twitter
+						</md-button>
+					</div>
+				</md-list-item>
+				<md-divider ></md-divider>
+				<md-list-item class="md-1-line" >
+					<div class="md-list-item-text" layout="column" style="width: 100%;">
+						<md-button href="mailto:?subject=Weteo @ {{locals.label}}&amp;body=Weteo @  {{locals.label}}%0D%0A%0D%0A{{locals.protocol}}//{{locals.host}}/{{locals.label | text2AlphaNum}}/{{locals.id}}" target="_blank"  class="md-raised">
+							Mail
+						</md-button>
+					</div>
+				</md-list-item>
+				
+
+				  
+					
+
+				
+				
+				
+
+			</md-list>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <span flex></span>
+
+			<md-button ng-click="cancel()"    md-no-ink class="md-primary md-autofocus">
+				OK
+			</md-button>
+			<span flex></span>
+    </md-dialog-actions>
+  </form>
+</md-dialog>
+
+
+<!--<md-dialog aria-label="Mango (Fruit)"  ng-cloak>
 	<form>
 		<md-toolbar>
 			<div class="md-toolbar-tools">
@@ -59,4 +127,4 @@
 			<span flex></span>
 		</div>
 	</form>
-</md-dialog>
+</md-dialog>-->

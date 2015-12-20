@@ -3,16 +3,16 @@ function searchViaID(id, $scope, $rootScope, $timeout, $http, $mdSidenav){
 	$mdSidenav('left').close();
 	
 	$timeout(function() {
-		$rootScope.loadingClass = "zoomOut";
+		$rootScope.animClass = "zoomOut";
 	
 		$timeout(function() {
-			$rootScope.loadingClass = "bounceIn";
+			$rootScope.animClass = "bounceIn";
 			
 			
 			
 			window.scrollTo(0,0);
 			var dataToday;
-	
+	 
 			$http.get('http://api.openweathermap.org/data/2.5/weather?id=' + id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
 				.success(function(data) {
 							

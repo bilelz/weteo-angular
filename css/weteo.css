@@ -8,8 +8,8 @@ body, html {
 	transform: translate3d(0,0,0);
 	z-index: 2;
 }
-
-.layout-column{
+ 
+md-content.flex{
 	background: #E5E5E5;
 }
 
