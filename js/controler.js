@@ -39,14 +39,14 @@ app.controller(
 				fav = { "label" : label, "id" : id, "lat" : lat, "lon" : lon };
 				
 				favlist.push(fav);
-				localStorage.setItem("favorites", JSON.stringify(favlist));
+				localStorage.setItem("favorites", JSON.stringify(favlist.sort(comparator)));
 				$rootScope.isFav = true;
 				
-				$rootScope.favList = JSON.parse(localStorage.getItem("favorites")).sort(comparator);
+				$rootScope.favList = JSON.parse(localStorage.getItem("favorites"));
 			}else{
 				removefav(id);
 				$rootScope.isFav = false;
-				$rootScope.favList = JSON.parse(localStorage.getItem("favorites")).sort(comparator);
+				$rootScope.favList = JSON.parse(localStorage.getItem("favorites"));
 			}
 		};
 		
@@ -55,9 +55,6 @@ app.controller(
 			chartIt(item);
 		};
 		
-		function comparator(a, b) {
-		    return a["label"] > b["label"];
-		}
 		
 	if (localStorage.getItem("cityID") != "") {
 			cityID = localStorage.getItem("cityID");

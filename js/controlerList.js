@@ -27,13 +27,20 @@ app.controller(
 	};
 	
 	$scope.goSearch = function() {
+			document.querySelector('[type="search"]').value = '';
 		 	$mdSidenav('left').close();
 		 	$mdSidenav('right').open();
 	};
 });
 
 function comparator(a, b) {
-    return a["label"] > b["label"];
+	
+	if( a["label"].toLowerCase() > b["label"].toLowerCase()){
+        return 1;
+    }else if( a["label"].toLowerCase() < b["label"].toLowerCase() ){
+        return -1;
+    }
+    return 0;
 }
 
 var favListDefault = [{"label":"Paris","id":2988507,"lat":48.85,"lon":2.35},{"label":"Java","id":614217,"lat":42.4,"lon":43.94},{"label":"Jenkins","id":4296229,"lat":37.17,"lon":-82.63},{"label":"Karlstad","id":2701680,"lat":59.38,"lon":13.5},{"label":"Eureka","id":5563397,"lat":40.8,"lon":-124.16},{"label":"Arnac-la-Poste","id":3036879,"lat":46.27,"lon":1.37}];
@@ -79,6 +86,6 @@ function isFav(_id){
 					favArray.push(favlist[i]);
 				}
 		}
-		localStorage.setItem("favorites", JSON.stringify(favArray));
+		localStorage.setItem("favorites", JSON.stringify(favArray.sort(comparator)));
 	}
 };

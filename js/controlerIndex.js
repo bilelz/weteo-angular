@@ -13,6 +13,12 @@ app.controller('AppCtrl', function ($scope, $timeout, $mdSidenav, $log) {
       $mdSidenav('left').close();
     };
     
+    $scope.goSearch = function() {
+    	document.querySelector('[type="search"]').value = '';
+	 	$mdSidenav('left').close();
+	 	$mdSidenav('right').open();
+    };
+    
     /**
      * Supplies a function that will continue to operate until the
      * time is up.
@@ -47,6 +53,7 @@ app.controller('AppCtrl', function ($scope, $timeout, $mdSidenav, $log) {
         $mdSidenav(navID)
           .toggle()
           .then(function () {
+        	  document.querySelector('[type="search"]').value = '';
             $log.debug("toggle " + navID + " is done");
           });
       }
