@@ -2,7 +2,7 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.0.1-master-2eaf210
+ * v1.0.5-master-437a308
  */
 goog.provide('ng.material.components.input');
 goog.require('ng.material.core');
@@ -23,6 +23,7 @@ angular.module('material.components.input', [
   .directive('ngMessages', ngMessagesDirective)
   .directive('ngMessage', ngMessageDirective)
   .directive('ngMessageExp', ngMessageDirective)
+  .directive('mdSelectOnFocus', mdSelectOnFocusDirective)
 
   .animation('.md-input-invalid', mdInputInvalidMessagesAnimation)
   .animation('.md-input-messages-animation', ngMessagesAnimation)
@@ -43,7 +44,7 @@ angular.module('material.components.input', [
  *
  * @param md-is-error {expression=} When the given expression evaluates to true, the input container
  *   will go into error state. Defaults to erroring if the input has been touched and is invalid.
- * @param md-no-float {boolean=} When present, placeholders will not be converted to floating
+ * @param md-no-float {boolean=} When present, `placeholder` attributes on the input will not be converted to floating
  *   labels.
  *
  * @usage
@@ -60,8 +61,20 @@ angular.module('material.components.input', [
  * </md-input-container>
  *
  * </hljs>
+ *
+ * <h3>When disabling floating labels</h3>
+ * <hljs lang="html">
+ *
+ * <md-input-container md-no-float>
+ *   <input type="text" placeholder="Non-Floating Label">
+ * </md-input-container>
+ *
+ * </hljs>
  */
 function mdInputContainerDirective($mdTheming, $parse) {
+
+  var INPUT_TAGS = ['INPUT', 'TEXTAREA', 'MD-SELECT'];
+
   ContainerCtrl.$inject = ["$scope", "$element", "$attrs", "$animate"];
   return {
     restrict: 'E',
@@ -69,9 +82,24 @@ function mdInputContainerDirective($mdTheming, $parse) {
     controller: ContainerCtrl
   };
 
-  function postLink(scope, element, attr) {
+  function postLink(scope, element) {
     $mdTheming(element);
-    if (element.find('md-icon').length) element.addClass('md-has-icon');
+
+    var iconElements = element.find('md-icon');
+    var icons = iconElements.length ? iconElements : element[0].getElementsByClassName('md-icon');
+
+    // Incase there's one icon we want to identify where the icon is (right or left) and apply the related class
+    if (icons.length == 1) {
+      var next = icons[0].nextElementSibling;
+      var previous = icons[0].previousElementSibling;
+
+      element.addClass(next && INPUT_TAGS.indexOf(next.tagName) != -1 ? 'md-icon-left' :
+                       previous &&  INPUT_TAGS.indexOf(previous.tagName) != -1 ? 'md-icon-right' : '');
+    }
+    // In case there are two icons we apply both icon classes
+    else if (icons.length == 2) {
+      element.addClass('md-icon-left md-icon-right');
+    }
   }
 
   function ContainerCtrl($scope, $element, $attrs, $animate) {
@@ -145,6 +173,7 @@ function labelDirective() {
  * @param {string=} placeholder An alternative approach to using aria-label when the label is not
  *   PRESENT. The placeholder text is copied to the aria-label attribute.
  * @param md-no-autogrow {boolean=} When present, textareas will not grow automatically.
+ * @param md-no-asterisk {boolean=} When present, asterisk will not be appended to required inputs label
  * @param md-detect-hidden {boolean=} When present, textareas will be sized properly when they are
  *   revealed after being hidden. This is off by default for performance reasons because it
  *   guarantees a reflow every digest cycle.
@@ -245,6 +274,9 @@ function inputTextareaDirective($mdUtil, $window, $mdAria) {
     var hasNgModel = !!ctrls[1];
     var ngModelCtrl = ctrls[1] || $mdUtil.fakeNgModel();
     var isReadonly = angular.isDefined(attr.readonly);
+    var isRequired = angular.isDefined(attr.required);
+    var mdNoAsterisk = angular.isDefined(attr.mdNoAsterisk);
+
 
     if (!containerCtrl) return;
     if (containerCtrl.input) {
@@ -254,10 +286,13 @@ function inputTextareaDirective($mdUtil, $window, $mdAria) {
 
     // Add an error spacer div after our input to provide space for the char counter and any ng-messages
     var errorsSpacer = angular.element('<div class="md-errors-spacer">');
-    element.after(errorsSpacer);
+    // element.after appending the div before the icon (if exist) which cause a problem with calculating which class to apply
+    element.parent().append(errorsSpacer);
 
     if (!containerCtrl.label) {
       $mdAria.expect(element, 'aria-label', element.attr('placeholder'));
+    } else if (isRequired && !mdNoAsterisk) {
+      containerCtrl.label.addClass('md-required');
     }
 
     element.addClass('md-input');
@@ -277,10 +312,14 @@ function inputTextareaDirective($mdUtil, $window, $mdAria) {
     }
 
     var isErrorGetter = containerCtrl.isErrorGetter || function() {
-      return ngModelCtrl.$invalid && (
-        ngModelCtrl.$touched ||
-        (ngModelCtrl.$$parentForm && ngModelCtrl.$$parentForm.$submitted)
-      );
+      return ngModelCtrl.$invalid && (ngModelCtrl.$touched || isParentFormSubmitted());
+    };
+
+    var isParentFormSubmitted = function () {
+      var parent = $mdUtil.getClosest(element, 'form');
+      var form = parent ? angular.element(parent).controller('form') : null;
+
+      return form ? form.$submitted : false;
     };
 
     scope.$watch(isErrorGetter, containerCtrl.setInvalid);
@@ -547,6 +586,29 @@ function placeholderDirective($log) {
 }
 placeholderDirective.$inject = ["$log"];
 
+function mdSelectOnFocusDirective() {
+
+  return {
+    restrict: 'A',
+    link: postLink
+  };
+
+  function postLink(scope, element, attr) {
+    if (element[0].nodeName !== 'INPUT' && element[0].nodeName !== "TEXTAREA") return;
+
+    element.on('focus', onFocus);
+
+    scope.$on('$destroy', function() {
+      element.off('focus', onFocus);
+    });
+
+    function onFocus() {
+      // Use HTMLInputElement#select to fix firefox select issues
+      element[0].select();
+    }
+  }
+}
+
 var visibilityDirectives = ['ngIf', 'ngShow', 'ngHide', 'ngSwitchWhen', 'ngSwitchDefault'];
 function ngMessagesDirective() {
   return {
@@ -609,6 +671,8 @@ function mdInputInvalidMessagesAnimation($q, $animateCss) {
 
       if (className == "md-input-invalid" && messages.hasClass('md-auto-hide')) {
         showInputMessages(element, $animateCss, $q).finally(done);
+      } else {
+        done();
       }
     }
 

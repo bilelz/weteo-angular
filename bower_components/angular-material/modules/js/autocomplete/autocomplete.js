@@ -2,7 +2,7 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.0.1-master-2eaf210
+ * v1.0.5-master-437a308
  */
 (function( window, angular, undefined ){
 "use strict";
@@ -40,7 +40,8 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
       noBlur               = false,
       selectedItemWatchers = [],
       hasFocus             = false,
-      lastCount            = 0;
+      lastCount            = 0,
+      promiseFetch         = false;
 
   //-- public variables with handlers
   defineProperty('hidden', handleHiddenChange, true);
@@ -655,19 +656,29 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    */
   function fetchResults (searchText) {
     var items = $scope.$parent.$eval(itemExpr),
-        term  = searchText.toLowerCase();
-    if (angular.isArray(items)) {
-      handleResults(items);
-    } else if (items) {
+        term  = searchText.toLowerCase(),
+        isList = angular.isArray(items);
+
+    if ( isList ) handleResults(items);
+    else          handleAsyncResults(items);
+
+    function handleAsyncResults(items) {
+      if ( !items ) return;
+
+      items = $q.when(items);
       setLoading(true);
+      promiseFetch = true;
+
       $mdUtil.nextTick(function () {
-        if (items.success) items.success(handleResults);
-        if (items.then)    items.then(handleResults);
-        if (items.finally) items.finally(function () {
-          setLoading(false);
-        });
+          items
+            .then(handleResults)
+            .finally(function(){
+              setLoading(false);
+              promiseFetch = false;
+            });
       },true, $scope);
     }
+
     function handleResults (matches) {
       cache[ term ] = matches;
       if ((searchText || '') !== ($scope.searchText || '')) return; //-- just cache the results if old request
@@ -729,7 +740,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
   function notFoundVisible () {
     var textLength = (ctrl.scope.searchText || '').length;
 
-    return ctrl.hasNotFound && !hasMatches() && !ctrl.loading && textLength >= getMinLength() && hasFocus && !hasSelection();
+    return ctrl.hasNotFound && !hasMatches() && (!ctrl.loading || promiseFetch) && textLength >= getMinLength() && (hasFocus || noBlur) && !hasSelection();
   }
 
   /**
@@ -760,7 +771,12 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
         matches    = ctrl.matches,
         item       = matches[ 0 ];
     if (matches.length === 1) getDisplayValue(item).then(function (displayValue) {
-      if (searchText == displayValue) select(0);
+      var isMatching = searchText == displayValue;
+      if ($scope.matchInsensitive && !isMatching) {
+        isMatching = searchText.toLowerCase() == displayValue.toLowerCase();
+      }
+
+      if (isMatching) select(0);
     });
   }
 
@@ -830,6 +846,8 @@ angular
  * @param {number=} md-input-maxlength The maximum length for the input's value for validation
  * @param {boolean=} md-select-on-match When set, autocomplete will automatically select exact
  *     the item if the search text is an exact match
+ * @param {boolean=} md-match-case-insensitive When set and using `md-select-on-match`, autocomplete
+ *     will select on case-insensitive match
  *
  * @usage
  * ### Basic Example
@@ -887,34 +905,35 @@ angular
  */
 
 function MdAutocomplete () {
-  var hasNotFoundTemplate = false;
 
   return {
     controller:   'MdAutocompleteCtrl',
     controllerAs: '$mdAutocompleteCtrl',
     scope:        {
-      inputName:      '@mdInputName',
-      inputMinlength: '@mdInputMinlength',
-      inputMaxlength: '@mdInputMaxlength',
-      searchText:     '=?mdSearchText',
-      selectedItem:   '=?mdSelectedItem',
-      itemsExpr:      '@mdItems',
-      itemText:       '&mdItemText',
-      placeholder:    '@placeholder',
-      noCache:        '=?mdNoCache',
-      selectOnMatch:  '=?mdSelectOnMatch',
-      itemChange:     '&?mdSelectedItemChange',
-      textChange:     '&?mdSearchTextChange',
-      minLength:      '=?mdMinLength',
-      delay:          '=?mdDelay',
-      autofocus:      '=?mdAutofocus',
-      floatingLabel:  '@?mdFloatingLabel',
-      autoselect:     '=?mdAutoselect',
-      menuClass:      '@?mdMenuClass',
-      inputId:        '@?mdInputId'
+      inputName:        '@mdInputName',
+      inputMinlength:   '@mdInputMinlength',
+      inputMaxlength:   '@mdInputMaxlength',
+      searchText:       '=?mdSearchText',
+      selectedItem:     '=?mdSelectedItem',
+      itemsExpr:        '@mdItems',
+      itemText:         '&mdItemText',
+      placeholder:      '@placeholder',
+      noCache:          '=?mdNoCache',
+      selectOnMatch:    '=?mdSelectOnMatch',
+      matchInsensitive: '=?mdMatchCaseInsensitive',
+      itemChange:       '&?mdSelectedItemChange',
+      textChange:       '&?mdSearchTextChange',
+      minLength:        '=?mdMinLength',
+      delay:            '=?mdDelay',
+      autofocus:        '=?mdAutofocus',
+      floatingLabel:    '@?mdFloatingLabel',
+      autoselect:       '=?mdAutoselect',
+      menuClass:        '@?mdMenuClass',
+      inputId:          '@?mdInputId'
     },
     link: function(scope, element, attrs, controller) {
-      controller.hasNotFound = hasNotFoundTemplate;
+      controller.hasNotFound = element.hasNotFoundTemplate;
+      delete element.hasNotFoundTemplate;
     },
     template:     function (element, attr) {
       var noItemsTemplate = getNoItemsTemplate(),
@@ -923,9 +942,11 @@ function MdAutocomplete () {
           tabindex        = attr.tabindex;
 
       // Set our variable for the link function above which runs later
-      hasNotFoundTemplate = noItemsTemplate ? true : false;
+      element.hasNotFoundTemplate = !!noItemsTemplate;
 
-      if (!attr.hasOwnProperty('tabindex')) element.attr('tabindex', '-1');
+      // Always set our tabindex of the autocomplete directive to -1, because our input
+      // will hold the actual tabindex.
+      element.attr('tabindex', '-1');
 
       return '\
         <md-autocomplete-wrap\

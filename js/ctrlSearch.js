@@ -19,7 +19,7 @@ app.controller(
 			}, 1000 / 2);
 			
 
-			$http.get('http://api.openweathermap.org/data/2.5/weather?q=' + this.city + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
+			$http.get('http://api.openweathermap.org/data/2.5/weather?q=' + this.city + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=0ada432b59deb9716c357092c5f79be6')
 					.success(function(data) {
 							
 						if(data.cod == 200){
@@ -35,7 +35,7 @@ app.controller(
 							$mdSidenav('right').close();
 							window.scrollTo(0,0);
 							
-							$http.get('http://api.openweathermap.org/data/2.5/forecast?id='+ data.id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
+							$http.get('http://api.openweathermap.org/data/2.5/forecast?id='+ data.id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=0ada432b59deb9716c357092c5f79be6')
 								.success(function(forecast) {
 									$rootScope.forecast = parseForecastFromScratch(forecast, dataToday);
 									$scope.messageError = null;

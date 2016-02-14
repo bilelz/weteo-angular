@@ -2,7 +2,7 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.0.1-master-2eaf210
+ * v1.0.5-master-437a308
  */
 goog.provide('ng.material.components.fabToolbar');
 goog.require('ng.material.components.fabActions');
@@ -95,7 +95,7 @@ goog.require('ng.material.core');
       },
 
       bindToController: true,
-      controller: 'FabController',
+      controller: 'MdFabController',
       controllerAs: 'vm',
 
       link: link

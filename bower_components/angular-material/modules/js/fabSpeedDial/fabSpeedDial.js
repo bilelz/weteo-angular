@@ -2,7 +2,7 @@
  * Angular Material Design
  * https://github.com/angular/material
  * @license MIT
- * v1.0.1-master-2eaf210
+ * v1.0.5-master-437a308
  */
 (function( window, angular, undefined ){
 "use strict";
@@ -11,9 +11,9 @@
   'use strict';
 
   angular.module('material.components.fabShared', ['material.core'])
-    .controller('FabController', FabController);
+    .controller('MdFabController', MdFabController);
 
-  function FabController($scope, $element, $animate, $mdUtil, $mdConstant, $timeout) {
+  function MdFabController($scope, $element, $animate, $mdUtil, $mdConstant, $timeout) {
     var vm = this;
 
     // NOTE: We use async eval(s) below to avoid conflicts with any existing digest loops
@@ -302,7 +302,7 @@
       return $element.find('md-fab-actions');
     }
   }
-  FabController.$inject = ["$scope", "$element", "$animate", "$mdUtil", "$mdConstant", "$timeout"];
+  MdFabController.$inject = ["$scope", "$element", "$animate", "$mdUtil", "$mdConstant", "$timeout"];
 })();
 
 (function() {
@@ -372,6 +372,14 @@
    * space where the actions will appear, you must also add the `md-hover-full` class to the speed
    * dial element. Without this, the hover effect will only occur on top of the trigger.
    *
+   * See the demos for more information.
+   *
+   * ## Troubleshooting
+   *
+   * If your speed dial shows the closing animation upon launch, you may need to use `ng-cloak` on
+   * the parent container to ensure that it is only visible once ready. We have plans to remove this
+   * necessity in the future.
+   *
    * @usage
    * <hljs lang="html">
    * <md-fab-speed-dial md-direction="up" class="md-fling">
@@ -405,7 +413,7 @@
       },
 
       bindToController: true,
-      controller: 'FabController',
+      controller: 'MdFabController',
       controllerAs: 'vm',
 
       link: FabSpeedDialLink
@@ -531,7 +539,7 @@
           offsetDelay = index * delay;
 
         styles.opacity = ctrl.isOpen ? 1 : 0;
-        styles.transform = styles.webkitTransform = ctrl.isOpen ? 'scale(1)' : 'scale(0.1)';
+        styles.transform = styles.webkitTransform = ctrl.isOpen ? 'scale(1)' : 'scale(0)';
         styles.transitionDelay = (ctrl.isOpen ? offsetDelay : (items.length - offsetDelay)) + 'ms';
 
         // Make the items closest to the trigger have the highest z-index

@@ -13,7 +13,7 @@ function searchViaID(id, $scope, $rootScope, $timeout, $http, $mdSidenav){
 			window.scrollTo(0,0);
 			var dataToday;
 	 
-			$http.get('http://api.openweathermap.org/data/2.5/weather?id=' + id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
+			$http.get('http://api.openweathermap.org/data/2.5/weather?id=' + id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=0ada432b59deb9716c357092c5f79be6')
 				.success(function(data) {
 							
 							$rootScope.currentID = data.id;
@@ -25,7 +25,7 @@ function searchViaID(id, $scope, $rootScope, $timeout, $http, $mdSidenav){
 							$rootScope.isFav = isFav(id);
 							
 							
-							$http.get('http://api.openweathermap.org/data/2.5/forecast?id='+ id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=2de143494c0b295cca9337e1e96b00e0')
+							$http.get('http://api.openweathermap.org/data/2.5/forecast?id='+ id + '&units=' + $scope.units + '&lang=' + $scope.lang + '&appid=0ada432b59deb9716c357092c5f79be6')
 								.success(function(forecast) {
 									//parseForecastFromScratch(forecast, dataToday);
 									$rootScope.forecast = parseForecastFromScratch(forecast, dataToday);
